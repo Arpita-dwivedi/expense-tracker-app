@@ -1,0 +1,75 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 380px;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.signup-container h1 {
+    color: #2E7D32;
+    margin-bottom: 6px;
+}
+
+.signup-container p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.signup-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.signup-container input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.signup-container button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.signup-container button:hover {
+    background: #43A047;
+}
+
+.signup-container span {
+    display: block;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.signup-container a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 600;
+}
