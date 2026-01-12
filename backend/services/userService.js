@@ -1,4 +1,6 @@
 const User = require("../models/userModel");
+const bcrypt = require("bcrypt");
+
 
 exports.registerUser = async ({ fullName, email, password }) => {
 
@@ -10,10 +12,13 @@ exports.registerUser = async ({ fullName, email, password }) => {
         throw new Error("EMAIL_EXISTS");
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+
     await User.create({
         fullName,
         email,
-        password 
+        password: hashedPassword
     });
 
     return true;
@@ -28,7 +33,12 @@ exports.loginUser = async (email, password) => {
         };
     }
 
-    if (user.password !== password) {
+    const isPasswordMatch = await bcrypt.compare(
+        password,       
+        user.password    
+    );
+
+    if (!isPasswordMatch) {
         return {
             success: false,
             message: "Wrong password"
