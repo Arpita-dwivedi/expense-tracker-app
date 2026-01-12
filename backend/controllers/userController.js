@@ -20,3 +20,15 @@ exports.signup = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    const result = await UserService.loginUser(email, password);
+
+    if (!result.success) {
+        return res.status(401).json({ message: result.message });
+    }
+
+    res.status(200).json({ message: "Login successful" });
+};
+

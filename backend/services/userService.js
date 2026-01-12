@@ -18,3 +18,26 @@ exports.registerUser = async ({ fullName, email, password }) => {
 
     return true;
 };
+exports.loginUser = async (email, password) => {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+        return {
+            success: false,
+            message: "Email does not exist"
+        };
+    }
+
+    if (user.password !== password) {
+        return {
+            success: false,
+            message: "Wrong password"
+        };
+    }
+
+    return {
+        success: true,
+        user
+    };
+};
+
