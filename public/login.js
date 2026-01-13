@@ -1,8 +1,15 @@
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+console.log("LOGIN JS LOADED");
 
+const loginBtn = document.getElementById("loginBtn");
+
+loginBtn.addEventListener("click", async () => {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+        alert("Email and password required");
+        return;
+    }
 
     try {
         const res = await axios.post(
@@ -10,9 +17,22 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
             { email, password }
         );
 
-        alert(res.data.message);
-        
+        console.log("LOGIN RESPONSE:", res.data);
+
+        if (res.data.success === true) {
+            localStorage.setItem("isLoggedIn", "true");
+            window.location.href = "/dashboard.html";
+        } else {
+            alert(res.data.message || "Login failed");
+        }
+
     } catch (err) {
-        alert(err.response?.data?.message || "Login failed");
+        console.error(err);
+
+        if (err.response) {
+            alert(err.response.data.message || "Login error");
+        } else {
+            alert("Server not reachable");
+        }
     }
 });
