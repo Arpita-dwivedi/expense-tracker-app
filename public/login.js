@@ -20,7 +20,7 @@ loginBtn.addEventListener("click", async () => {
         console.log("LOGIN RESPONSE:", res.data);
 
         if (res.data.success === true) {
-            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("token", res.data.token);
             window.location.href = "/dashboard.html";
         } else {
             alert(res.data.message || "Login failed");

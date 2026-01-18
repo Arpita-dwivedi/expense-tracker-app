@@ -4,6 +4,7 @@ const path = require("path");
 const sequelize = require("./utils/database");
 const userRoutes = require("./routes/userRoute");
 const expenseRoutes = require("./routes/expenseRoute");
+require("./models/association"); // Require associations to set them up
 
 const app = express();
 
