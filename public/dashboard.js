@@ -117,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 const cashfree = Cashfree({
-                    appId: "TEST430329ae80e0f32e41a393d78b923034",
                     mode: "sandbox"
                 });
 
