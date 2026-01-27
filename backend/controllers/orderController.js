@@ -1,4 +1,5 @@
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
 const { Cashfree, CFEnvironment } = require("cashfree-pg"); 
 const cashfree = new Cashfree(CFEnvironment.SANDBOX, "TEST430329ae80e0f32e41a393d78b923034", "TESTaf195616268bd6202eeb3bf8dc458956e7192a85");
 
@@ -25,7 +26,7 @@ const createOrder = async (req, res) => {
             },
 
             order_meta: {
-                return_url: `http://localhost:3000/api/order/premium/${orderId}`
+                return_url: `http://localhost:3000/dashboard.html?paymentDone=true`
             },
 
             order_expiry_time: new Date(
@@ -68,15 +69,23 @@ const statusService = async (req, res, next) => {
             }
         })
         order.paymentStatus = orderStatus
+
         await order.save()
+        if (orderStatus === "Success") {
+            const user = await User.findByPk(order.UserId);
+            user.isPremium = true;
+            await user.save();
+        }
+
         res.status(200).json({
             message: "Payment Scuccessful",
             success: true,
             orderStatus
         })
     }
-    catch (e) {
-        throw e
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error", success: false});
     }
 }
 module.exports = { statusService, createOrder }

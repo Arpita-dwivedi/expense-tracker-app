@@ -1,9 +1,30 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     const token = localStorage.getItem("token");
     if (!token) {
         window.location.replace("/login.html");
-        return; 
+        return;
+    }
+
+    // Check if coming back from payment
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('paymentDone')) {
+        const orderId = sessionStorage.getItem("lastOrderId");
+        if (orderId) {
+            console.log("Payment completed, verifying order:", orderId);
+            const token = localStorage.getItem("token");
+            try {
+                await axios.get(
+                    `http://localhost:3000/api/order/premium/${orderId}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                console.log("Order status verified");
+            } catch (err) {
+                console.error("Order verification error:", err);
+            }
+            sessionStorage.removeItem("lastOrderId");
+            await new Promise(resolve => setTimeout(resolve, 1500));
+        }
     }
 
     const expenseForm = document.getElementById("expenseForm");
@@ -116,13 +137,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     {},
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
+                
+                // Store orderId for later use
+                sessionStorage.setItem("lastOrderId", res.data.orderId);
+                
                 const cashfree = Cashfree({
                     mode: "sandbox"
                 });
 
                 cashfree.checkout({
                     paymentSessionId: res.data.paymentSessionId,
-                    redirectTarget: "_modal"
+                    redirectTarget: "_self"
                 });
             } catch (err) {
                 console.error("Buy Premium error:", err);
@@ -136,4 +161,34 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+    async function checkPremiumStatus() {
+        try {
+            const token = localStorage.getItem("token");
+            console.log("checkPremiumStatus - Token:", token ? "Present" : "MISSING");
+            
+            if (!token) {
+                console.error("No token found!");
+                return;
+            }
+
+            const res = await axios.get(
+                "http://localhost:3000/api/users/me",
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            console.log("Premium status response:", res.data);
+
+            if (res.data.isPremium) {
+                const msgBox = document.getElementById("premiumMessage");
+                if (msgBox) msgBox.style.display = "block";
+            }
+            if (res.data.isPremium) {
+                const btn = document.getElementById("buyPremiumBtn");
+                if (btn) btn.style.display = "none";
+            }
+        } catch (err) {
+            console.error("checkPremiumStatus error:", err.response?.data || err.message);
+        }
+    }
+    checkPremiumStatus();
 });

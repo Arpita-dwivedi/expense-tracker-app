@@ -8,7 +8,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
     try {
         const res = await axios.post(
             "http://localhost:3000/api/users/signup",
-            { fullName, email, password }
+            { fullName, email, password,isPremium: false }
         );
 
         alert(res.data.message);

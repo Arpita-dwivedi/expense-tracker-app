@@ -129,7 +129,7 @@ button:hover {
 .premium-btn {
     width: auto;
     padding: 8px 16px;
-    background: #ff9800;  /* Orange for premium */
+    background: #ff9800;  
     color: #fff;
     border-radius: 6px;
     font-size: 14px;
@@ -138,4 +138,15 @@ button:hover {
 
 .premium-btn:hover {
     background: #e68900;
+}
+.premium-msg {
+    background: linear-gradient(135deg, #FFD700, #FFA000);
+    color: #2e2e2e;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
