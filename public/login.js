@@ -1,5 +1,3 @@
-console.log("LOGIN JS LOADED");
-
 const loginBtn = document.getElementById("loginBtn");
 
 loginBtn.addEventListener("click", async () => {

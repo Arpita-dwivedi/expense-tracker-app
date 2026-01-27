@@ -99,4 +99,42 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.removeItem("token");
         window.location.replace("/login.html");
     });
+
+    const buyPremiumBtn = document.getElementById("buyPremiumBtn");
+    if (buyPremiumBtn) {
+        buyPremiumBtn.addEventListener("click", async () => {
+            try {
+                const token = localStorage.getItem("token");
+                if (!token) {
+                    alert("Please log in first.");
+                    window.location.replace("/login.html");
+                    return;
+                }
+
+                const res = await axios.post(
+                    "http://localhost:3000/api/order/premium",
+                    {},
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                const cashfree = Cashfree({
+                    appId: "TEST430329ae80e0f32e41a393d78b923034",
+                    mode: "sandbox"
+                });
+
+                cashfree.checkout({
+                    paymentSessionId: res.data.paymentSessionId,
+                    redirectTarget: "_modal"
+                });
+            } catch (err) {
+                console.error("Buy Premium error:", err);
+                if (err.response && err.response.status === 401) {
+                    alert("Session expired. Please log in again.");
+                    localStorage.removeItem("token");
+                    window.location.replace("/login.html");
+                } else {
+                    alert("Failed to initiate premium purchase. Please try again.");
+                }
+            }
+        });
+    }
 });
