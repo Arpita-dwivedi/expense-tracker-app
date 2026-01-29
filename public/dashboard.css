@@ -26,7 +26,7 @@ body {
 
 h2 {
     text-align: center;
-    color: #2E7D32;
+    color: #eb137f;
     margin-bottom: 20px;
 }
 
@@ -86,7 +86,7 @@ button:hover {
 }
 
 .delete-btn {
-    background: #e53935;
+    background: #ee1411;
     color: #fff;
     border: none;
     padding: 5px 12px;
@@ -104,18 +104,18 @@ button:hover {
 
 .logout-btn {
     margin-top: 10px;
-    align-self: flex-end;
     width: auto;
-    padding: 8px 16px;
-    background: #d32f2f;
-    color: #fff;
+    background: #ee0707;
+    color: #f5f7e3;
     border-radius: 6px;
     font-size: 14px;
-    cursor: pointer;
+    position: fixed;
+    top: 90%;
+    left: 0;
 }
 
 .logout-btn:hover {
-    background: #c62828;
+    background: #810101;
 }
 
 .button-container {
@@ -149,4 +149,6 @@ button:hover {
     font-weight: 600;
     text-align: center;
     box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    position: fixed;
+    left :0%
 }
