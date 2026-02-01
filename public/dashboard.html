@@ -3,7 +3,7 @@
 
 <head>
     <title>Expense Tracker2</title>
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="leaderboard.css">
 </head>
 
 <body>
@@ -37,10 +37,19 @@
     <div id="premiumMessage" class="premium-msg" style="display: none;">
         🎉 Congratulations! You are now <strong> 👑Premium User</strong>
     </div>
+<div class="leaderboard-section">
+    <button id="showLeaderboardBtn" class="leaderboard-btn">Show Leaderboard</button>
+    <div id="leaderboardContainer" class="leaderboard-container hidden">
+        <h3>Premium Leaderboard: Top Spenders</h3>
+        <ul id="leaderboardList" class="leaderboard-list"></ul>
+    </div>
+    <div id="leaderboardError" class="error hidden"></div>  <!-- This must match 'leaderboardError' -->
+</div>
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script src="dashboard.js"></script>
+    <script src="leaderboard.js"></script>
 </body>
 
 </html>
