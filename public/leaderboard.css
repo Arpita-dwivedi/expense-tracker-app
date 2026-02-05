@@ -136,11 +136,13 @@ button:hover {
     border-radius: 12px;
     opacity: 0;
     transition: opacity 0.5s;
+    pointer-events: none; 
+    z-index: 1;
 }
 
 .expense-section li:hover::after {
     opacity: 1;
-}
+} 
 
 .button-container {
     margin-top: 20px;
@@ -166,7 +168,6 @@ button:hover {
     background-color: #e0a800;
 }
 
-/* Premium Message */
 .premium-msg {
     margin-top: 20px;
     padding: 15px;
@@ -224,6 +225,20 @@ button:hover {
     justify-content: space-between;
     align-items: center;
     border-left: 4px solid #007bff;
+}
+
+.delete-btn {
+    position: relative;
+    z-index: 3; 
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.delete-btn:hover {
+    background-color: #c82333;
 }
 
 .rank {

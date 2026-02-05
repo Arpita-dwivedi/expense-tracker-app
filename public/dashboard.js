@@ -6,19 +6,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    // Check if coming back from payment
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('paymentDone')) {
         const orderId = sessionStorage.getItem("lastOrderId");
         if (orderId) {
-            console.log("Payment completed, verifying order:", orderId);
             const token = localStorage.getItem("token");
             try {
                 await axios.get(
                     `http://localhost:3000/api/order/premium/${orderId}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                console.log("Order status verified");
             } catch (err) {
                 console.error("Order verification error:", err);
             }
@@ -77,10 +74,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 li.textContent = `${exp.amount} - ${exp.description} (${exp.category})`;
 
                 const btn = document.createElement("button");
+                btn.type = "button";
                 btn.textContent = "Delete";
                 btn.classList.add("delete-btn");
 
-                btn.onclick = async () => {
+                btn.addEventListener('click', async () => {
                     try {
                         await axios.delete(
                             `http://localhost:3000/api/expenses/${exp.id}`,
@@ -88,7 +86,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         );
                         loadExpenses();
                     } catch (err) {
-                        console.error(err);
+                        console.error(err.response?.data || err.message);
                         if (err.response && err.response.status === 401) {
                             alert("Session expired. Please log in again.");
                             localStorage.removeItem("token");
@@ -97,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             alert("Failed to delete expense");
                         }
                     }
-                };
+                });
 
                 li.appendChild(btn);
                 expenseList.appendChild(li);
@@ -137,10 +135,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                     {},
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                
-                // Store orderId for later use
+
                 sessionStorage.setItem("lastOrderId", res.data.orderId);
-                
+
                 const cashfree = Cashfree({
                     mode: "sandbox"
                 });
@@ -164,8 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function checkPremiumStatus() {
         try {
             const token = localStorage.getItem("token");
-            console.log("checkPremiumStatus - Token:", token ? "Present" : "MISSING");
-            
+
             if (!token) {
                 console.error("No token found!");
                 return;
@@ -175,8 +171,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 "http://localhost:3000/api/users/me",
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
-            console.log("Premium status response:", res.data);
 
             if (res.data.isPremium) {
                 const msgBox = document.getElementById("premiumMessage");
