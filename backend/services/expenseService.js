@@ -1,6 +1,11 @@
 const Expense = require("../models/expenseModel");
+const User = require("../models/userModel");
 
 exports.addExpense = async ({ amount, description, category, userId }) => {
+    await User.increment('totalExpense', {
+        by: amount,
+        where: { id: userId }
+    });
     return await Expense.create({
         amount,
         description,
@@ -27,5 +32,9 @@ exports.deleteExpense = async (expenseId, userId) => {
         throw new Error("NOT_ALLOWED");
     }
 
+    await User.decrement('totalExpense', {
+        by: expense.amount,
+        where: { id: userId }
+    });
     await expense.destroy();
 };
