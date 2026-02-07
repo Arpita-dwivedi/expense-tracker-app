@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Arpita-dwivedi/expense-tracker-app#readme",
   "dependencies": {
-    "@google/genai": "^1.40.0",
+    "@google/genai": "^0.3.0",
     "bcrypt": "^6.0.0",
     "cashfree-pg": "^5.1.0",
     "cors": "^2.8.5",

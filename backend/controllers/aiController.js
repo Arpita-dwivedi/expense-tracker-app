@@ -1,4 +1,4 @@
-const genai = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 
 const safeMapSuggest = (description) => {
     if (!description) return '';
@@ -42,12 +42,13 @@ exports.suggestCategory = async (req, res) => {
         let suggestion = '';
         if (process.env.GENAI_API_KEY) {
             try {
-                const client = new genai.TextGenerationClient({ apiKey: process.env.GENAI_API_KEY });
+                const ai = new GoogleGenAI({ apiKey: process.env.GENAI_API_KEY });
                 const prompt = `Choose one category from: Food, Groceries, Transport, Petrol, Utilities, Entertainment, Health, Rent, Salary, Miscellaneous.\nUser description: "${description}"\nReply with only the single category keyword.`;
-                const response = await client.generateContent({ model: 'gemini-pro', input: prompt });
-                if (response && response.candidates && response.candidates[0] && response.candidates[0].content) {
-                    suggestion = response.candidates[0].content.parts[0].text.trim();
-                }
+                const response = await ai.models.generateContent({
+                    model: "gemini-3-flash-preview",
+                    contents: prompt,
+                });
+                suggestion = response.text.trim();
             } catch (err) {
                 console.error('GenAI call failed, falling back to keyword mapping:', err.message || err);
                 suggestion = safeMapSuggest(description);

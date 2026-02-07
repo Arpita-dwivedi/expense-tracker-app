@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -9,6 +8,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const leaderboardRoutes = require("./routes/leaderboardRoute");
 const aiRoutes = require("./routes/aiRoute");
 require("./models/association");
+require('dotenv').config({path: path.join(__dirname, '.env')});
 
 const app = express();
 
