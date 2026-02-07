@@ -27,11 +27,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     const expenseForm = document.getElementById("expenseForm");
     const expenseList = document.getElementById("expenseList");
     const logoutBtn = document.getElementById("logoutBtn");
+    const descriptionInput = document.getElementById("description");
+    const categoryInput = document.getElementById("category");
+    const categorySuggestions = document.getElementById("categorySuggestions");
+
+    const staticCategories = ["Food", "Groceries", "Transport", "Petrol", "Utilities", "Entertainment", "Health", "Rent", "Salary", "Miscellaneous"];
 
     if (!expenseForm || !expenseList || !logoutBtn) {
         console.error("Dashboard DOM elements not found");
         return;
     }
+
+    if (descriptionInput) {
+        descriptionInput.addEventListener('input', async () => {
+            const text = descriptionInput.value.trim();
+            if (!text) {
+                categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
+                return;
+            }
+            try {
+                const res = await axios.post('/api/ai/suggest-category', { description: text });
+                const cat = res.data?.category;
+                if (cat) {
+                    categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('') + `<option value="${cat}"></option>`;
+                    if (categoryInput && !categoryInput.value) {
+                        categoryInput.value = cat;
+                    }
+                } else {
+                    categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
+                }
+            } catch (err) {
+                console.error('Suggestion error:', err);
+                categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
+            }
+        });
+    }
+
     expenseForm.addEventListener("submit", async (e) => {
         e.preventDefault();
 

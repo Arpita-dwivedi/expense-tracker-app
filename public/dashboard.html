@@ -15,12 +15,19 @@
 
             <input type="text" id="description" placeholder="Description" required />
 
-            <select id="category" required>
-                <option value="">Select Category</option>
-                <option value="Food">Food</option>
-                <option value="Petrol">Petrol</option>
-                <option value="Salary">Salary</option>
-            </select>
+            <input type="text" id="category" list="categorySuggestions" placeholder="Category" required />
+            <datalist id="categorySuggestions">
+                <option value="Food"></option>
+                <option value="Groceries"></option>
+                <option value="Transport"></option>
+                <option value="Petrol"></option>
+                <option value="Utilities"></option>
+                <option value="Entertainment"></option>
+                <option value="Health"></option>
+                <option value="Rent"></option>
+                <option value="Salary"></option>
+                <option value="Miscellaneous"></option>
+            </datalist>
 
             <button type="submit">Add Expense</button>
         </form>
