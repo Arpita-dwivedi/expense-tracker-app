@@ -28,7 +28,7 @@ exports.sendResetEmail = async (email, resetToken) => {
 
     if (transporter) {
         const mailOptions = {
-            from: process.env.EMAIL_USER,
+            from: `"Arpita Dwivedi" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Password Reset Request',
             html: `
