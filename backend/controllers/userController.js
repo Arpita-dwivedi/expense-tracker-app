@@ -53,3 +53,41 @@ exports.getMe = async (req, res) => {
     }
 };
 
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        const result = await UserService.forgotPassword(email);
+
+        res.status(200).json({ message: result.message, resetLink: result.resetLink });
+
+    } catch (err) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+
+        if (!token || !newPassword) {
+            return res.status(400).json({ message: "Token and new password are required" });
+        }
+
+        await UserService.resetPassword(token, newPassword);
+
+        res.status(200).json({ message: "Password reset successful" });
+
+    } catch (err) {
+        if (err.message === "INVALID_TOKEN") {
+            return res.status(400).json({ message: "Invalid or expired token" });
+        }
+
+        res.status(500).json({ message: "Server error" });
+    }
+};
+

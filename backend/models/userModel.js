@@ -29,6 +29,16 @@ const User = sequelize.define("User", {
     totalExpense: {
         type: DataTypes.FLOAT,
         defaultValue: 0
+    },
+
+    resetToken: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    resetTokenExpiry: {
+        type: DataTypes.DATE,
+        allowNull: true
     }
 });
 

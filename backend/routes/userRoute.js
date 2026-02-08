@@ -7,8 +7,10 @@ router.post("/signup", UserController.signup);
 
 router.post("/login", UserController.login);
 
-router.get("/me", auth, UserController.getMe);
+router.post("/forgot-password", UserController.forgotPassword);
 
-module.exports = router;
+router.post("/reset-password", UserController.resetPassword);
+
+router.get("/me", auth, UserController.getMe);
 
 module.exports = router;
