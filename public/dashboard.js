@@ -25,7 +25,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const expenseForm = document.getElementById("expenseForm");
-    const expenseList = document.getElementById("expenseList");
+    const transactionBody = document.getElementById("transactionBody");
+    const periodSelect = document.getElementById("periodSelect");
+    const downloadBtn = document.getElementById("downloadBtn");
     const logoutBtn = document.getElementById("logoutBtn");
     const descriptionInput = document.getElementById("description");
     const categoryInput = document.getElementById("category");
@@ -33,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const staticCategories = ["Food", "Groceries", "Transport", "Petrol", "Utilities", "Entertainment", "Health", "Rent", "Salary", "Miscellaneous"];
 
-    if (!expenseForm || !expenseList || !logoutBtn) {
+    if (!expenseForm || !transactionBody || !logoutBtn) {
         console.error("Dashboard DOM elements not found");
         return;
     }
@@ -91,31 +93,44 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     });
-    async function loadExpenses() {
+    async function loadExpenses(period = 'all') {
         try {
             const res = await axios.get(
-                "http://localhost:3000/api/expenses",
+                `http://localhost:3000/api/expenses?period=${period}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            expenseList.innerHTML = "";
+            transactionBody.innerHTML = "";
 
             res.data.forEach(exp => {
-                const li = document.createElement("li");
-                li.textContent = `${exp.amount} - ${exp.description} (${exp.category})`;
+                const tr = document.createElement("tr");
 
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.textContent = "Delete";
-                btn.classList.add("delete-btn");
+                const date = new Date(exp.createdAt).toLocaleDateString();
+                const debit = exp.category === 'Salary' ? '' : exp.amount;
+                const credit = exp.category === 'Salary' ? exp.amount : '';
 
-                btn.addEventListener('click', async () => {
+                tr.innerHTML = `
+                    <td style="border: 1px solid #ddd; padding: 8px;">${date}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${debit}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${credit}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${exp.description}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${exp.category}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;"><button class="delete-btn" data-id="${exp.id}">Delete</button></td>
+                `;
+
+                transactionBody.appendChild(tr);
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.target.getAttribute('data-id');
                     try {
                         await axios.delete(
-                            `http://localhost:3000/api/expenses/${exp.id}`,
+                            `http://localhost:3000/api/expenses/${id}`,
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
-                        loadExpenses();
+                        loadExpenses(period);
                     } catch (err) {
                         console.error(err.response?.data || err.message);
                         if (err.response && err.response.status === 401) {
@@ -127,9 +142,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         }
                     }
                 });
-
-                li.appendChild(btn);
-                expenseList.appendChild(li);
             });
 
         } catch (err) {
@@ -145,6 +157,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     loadExpenses();
+
+    periodSelect.addEventListener("change", () => {
+        loadExpenses(periodSelect.value);
+    });
+
     logoutBtn.addEventListener("click", () => {
         localStorage.removeItem("token");
         window.location.replace("/login.html");
@@ -206,14 +223,46 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (res.data.isPremium) {
                 const msgBox = document.getElementById("premiumMessage");
                 if (msgBox) msgBox.style.display = "block";
-            }
-            if (res.data.isPremium) {
                 const btn = document.getElementById("buyPremiumBtn");
                 if (btn) btn.style.display = "none";
+                if (downloadBtn) downloadBtn.disabled = false;
+            } else {
+                if (downloadBtn) downloadBtn.disabled = true;
             }
         } catch (err) {
             console.error("checkPremiumStatus error:", err.response?.data || err.message);
         }
+    }
+
+    if (downloadBtn) {
+        downloadBtn.addEventListener("click", async () => {
+            try {
+                const res = await axios.get(
+                    `http://localhost:3000/api/expenses?period=${periodSelect.value}`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+
+                const csvContent = "data:text/csv;charset=utf-8,"
+                    + "Date,Debit,Credit,Description,Category\n"
+                    + res.data.map(exp => {
+                        const date = new Date(exp.createdAt).toLocaleDateString();
+                        const debit = exp.category === 'Salary' ? '' : exp.amount;
+                        const credit = exp.category === 'Salary' ? exp.amount : '';
+                        return `${date},${debit},${credit},"${exp.description}",${exp.category}`;
+                    }).join("\n");
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "expenses.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (err) {
+                console.error("Download error:", err);
+                alert("Failed to download expenses");
+            }
+        });
     }
     checkPremiumStatus();
 });

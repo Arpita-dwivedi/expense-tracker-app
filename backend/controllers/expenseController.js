@@ -18,7 +18,8 @@ exports.addExpense = async (req, res) => {
 
 exports.getExpenses = async (req, res) => {
     try{
-        const expenses = await expenseService.getExpenses(req.user.id);
+        const period = req.query.period || 'all';
+        const expenses = await expenseService.getExpenses(req.user.id, period);
         res.json(expenses);
     } catch (err){
         res.status(500).json({message:"server error"});

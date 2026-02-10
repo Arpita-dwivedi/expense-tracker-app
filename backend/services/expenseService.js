@@ -1,12 +1,16 @@
 const Expense = require("../models/expenseModel");
 const User = require("../models/userModel");
 const sequelize = require("../utils/database");
+const { Op } = require("sequelize");
 
 exports.addExpense = async ({ amount, description, category, userId }) => {
     const t = await sequelize.transaction();
     try {
+        // For Salary category, treat as income (negative amount for totalExpense)
+        const adjustedAmount = category === 'Salary' ? -Math.abs(amount) : amount;
+
         await User.increment('totalExpense', {
-            by: amount,
+            by: adjustedAmount,
             where: { id: userId },
             transaction: t
         });
@@ -24,9 +28,31 @@ exports.addExpense = async ({ amount, description, category, userId }) => {
     }
 };
 
-exports.getExpenses = async (userId) => {
+exports.getExpenses = async (userId, period = 'all') => {
+    let whereClause = { UserId: userId };
+
+    if (period !== 'all') {
+        const now = new Date();
+        let startDate;
+
+        if (period === 'daily') {
+            startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        } else if (period === 'weekly') {
+            const dayOfWeek = now.getDay(); // 0 = Sunday
+            startDate = new Date(now.getTime() - dayOfWeek * 24 * 60 * 60 * 1000);
+            startDate.setHours(0, 0, 0, 0);
+        } else if (period === 'monthly') {
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        }
+
+        if (startDate) {
+            whereClause.createdAt = { [Op.gte]: startDate };
+        }
+    }
+
     return await Expense.findAll({
-        where:{ UserId:userId}
+        where: whereClause,
+        order: [['createdAt', 'DESC']]
     });
 };
 
@@ -46,8 +72,11 @@ exports.deleteExpense = async (expenseId, userId) => {
             throw new Error("NOT_ALLOWED");
         }
 
+        // For Salary category, adjust totalExpense accordingly
+        const adjustedAmount = expense.category === 'Salary' ? -Math.abs(expense.amount) : expense.amount;
+
         await User.decrement('totalExpense', {
-            by: expense.amount,
+            by: adjustedAmount,
             where: { id: userId },
             transaction: t
         });
