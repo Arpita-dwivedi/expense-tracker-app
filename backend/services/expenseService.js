@@ -6,7 +6,6 @@ const { Op } = require("sequelize");
 exports.addExpense = async ({ amount, description, category, userId }) => {
     const t = await sequelize.transaction();
     try {
-        // For Salary category, treat as income (negative amount for totalExpense)
         const adjustedAmount = category === 'Salary' ? -Math.abs(amount) : amount;
 
         await User.increment('totalExpense', {
@@ -72,7 +71,6 @@ exports.deleteExpense = async (expenseId, userId) => {
             throw new Error("NOT_ALLOWED");
         }
 
-        // For Salary category, adjust totalExpense accordingly
         const adjustedAmount = expense.category === 'Salary' ? -Math.abs(expense.amount) : expense.amount;
 
         await User.decrement('totalExpense', {

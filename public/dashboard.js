@@ -121,7 +121,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 transactionBody.appendChild(tr);
             });
 
-            // Add event listeners to delete buttons
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = e.target.getAttribute('data-id');
