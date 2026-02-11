@@ -2,15 +2,16 @@ const expenseService = require("../services/expenseService");
 
 exports.addExpense = async (req, res) => {
     try{
-        const { amount, description, category } = req.body;
+        const { amount, description, category, note } = req.body;
 
         await expenseService.addExpense({
             amount: parseInt(amount),
             description,
             category,
+            note,
             userId: req.user.id
         });
-        res.status(201).json({ message: "Expense added" });  
+        res.status(201).json({ message: "Expense added" });
     } catch(err){
         res.status(500).json({message:"server error"});
     }

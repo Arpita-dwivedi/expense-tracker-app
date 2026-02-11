@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const sequelize = require("../utils/database");
 const { Op } = require("sequelize");
 
-exports.addExpense = async ({ amount, description, category, userId }) => {
+exports.addExpense = async ({ amount, description, category, note, userId }) => {
     const t = await sequelize.transaction();
     try {
         const adjustedAmount = category === 'Salary' ? -Math.abs(amount) : amount;
@@ -17,6 +17,7 @@ exports.addExpense = async ({ amount, description, category, userId }) => {
             amount,
             description,
             category,
+            note,
             UserId: userId
         }, { transaction: t });
         await t.commit();

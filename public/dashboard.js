@@ -123,6 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <td style="border: 1px solid #ddd; padding: 8px;">${credit}</td>
                     <td style="border: 1px solid #ddd; padding: 8px;">${exp.description}</td>
                     <td style="border: 1px solid #ddd; padding: 8px;">${exp.category}</td>
+                    <td style="border: 1px solid #ddd; padding: 8px;">${exp.note || ''}</td>
                     <td style="border: 1px solid #ddd; padding: 8px;"><button class="delete-btn" data-id="${exp.id}">Delete</button></td>
                 `;
 
