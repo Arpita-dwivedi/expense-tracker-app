@@ -32,6 +32,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const descriptionInput = document.getElementById("description");
     const categoryInput = document.getElementById("category");
     const categorySuggestions = document.getElementById("categorySuggestions");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const pageInfo = document.getElementById("pageInfo");
+
+    let currentPage = 1;
+    let totalPages = 1;
 
     const staticCategories = ["Food", "Groceries", "Transport", "Petrol", "Utilities", "Entertainment", "Health", "Rent", "Salary", "Miscellaneous"];
 
@@ -93,16 +99,16 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     });
-    async function loadExpenses(period = 'all') {
+    async function loadExpenses(period = 'all', page = 1) {
         try {
             const res = await axios.get(
-                `http://localhost:3000/api/expenses?period=${period}`,
+                `http://localhost:3000/api/expenses?period=${period}&page=${page}&limit=10`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             transactionBody.innerHTML = "";
 
-            res.data.forEach(exp => {
+            res.data.expenses.forEach(exp => {
                 const tr = document.createElement("tr");
 
                 const date = new Date(exp.createdAt).toLocaleDateString();
@@ -121,6 +127,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 transactionBody.appendChild(tr);
             });
 
+            totalPages = res.data.totalPages;
+            currentPage = res.data.currentPage;
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = e.target.getAttribute('data-id');
@@ -129,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                             `http://localhost:3000/api/expenses/${id}`,
                             { headers: { Authorization: `Bearer ${token}` } }
                         );
-                        loadExpenses(period);
+                        loadExpenses(period, currentPage);
                     } catch (err) {
                         console.error(err.response?.data || err.message);
                         if (err.response && err.response.status === 401) {
@@ -158,7 +171,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     loadExpenses();
 
     periodSelect.addEventListener("change", () => {
-        loadExpenses(periodSelect.value);
+        currentPage = 1;
+        loadExpenses(periodSelect.value, currentPage);
+    });
+
+    prevBtn.addEventListener("click", () => {
+        if (currentPage > 1) {
+            currentPage--;
+            loadExpenses(periodSelect.value, currentPage);
+        }
+    });
+
+    nextBtn.addEventListener("click", () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            loadExpenses(periodSelect.value, currentPage);
+        }
     });
 
     logoutBtn.addEventListener("click", () => {

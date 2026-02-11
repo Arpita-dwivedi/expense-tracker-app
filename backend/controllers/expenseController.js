@@ -19,8 +19,15 @@ exports.addExpense = async (req, res) => {
 exports.getExpenses = async (req, res) => {
     try{
         const period = req.query.period || 'all';
-        const expenses = await expenseService.getExpenses(req.user.id, period);
-        res.json(expenses);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const result = await expenseService.getExpenses(req.user.id, period, page, limit);
+        const totalPages = Math.ceil(result.totalCount / limit);
+        res.json({
+            expenses: result.expenses,
+            totalPages,
+            currentPage: page
+        });
     } catch (err){
         res.status(500).json({message:"server error"});
     }

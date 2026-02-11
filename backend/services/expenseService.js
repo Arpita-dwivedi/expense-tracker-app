@@ -27,7 +27,7 @@ exports.addExpense = async ({ amount, description, category, userId }) => {
     }
 };
 
-exports.getExpenses = async (userId, period = 'all') => {
+exports.getExpenses = async (userId, period = 'all', page = 1, limit = 10) => {
     let whereClause = { UserId: userId };
 
     if (period !== 'all') {
@@ -37,7 +37,7 @@ exports.getExpenses = async (userId, period = 'all') => {
         if (period === 'daily') {
             startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         } else if (period === 'weekly') {
-            const dayOfWeek = now.getDay(); // 0 = Sunday
+            const dayOfWeek = now.getDay(); 
             startDate = new Date(now.getTime() - dayOfWeek * 24 * 60 * 60 * 1000);
             startDate.setHours(0, 0, 0, 0);
         } else if (period === 'monthly') {
@@ -49,10 +49,19 @@ exports.getExpenses = async (userId, period = 'all') => {
         }
     }
 
-    return await Expense.findAll({
+    const offset = (page - 1) * limit;
+
+    const result = await Expense.findAndCountAll({
         where: whereClause,
-        order: [['createdAt', 'DESC']]
+        order: [['createdAt', 'DESC']],
+        limit: limit,
+        offset: offset
     });
+
+    return {
+        expenses: result.rows,
+        totalCount: result.count
+    };
 };
 
 exports.deleteExpense = async (expenseId, userId) => {
