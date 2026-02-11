@@ -1,48 +1,4 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 20px;
-    color: #333;
-}
 
-.container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-h2, h3 {
-    color: #007bff;
-    text-align: center;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-input, select, button {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-button {
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button:hover {
-    background-color: #218838;
-}
 
 .expense-section {
     margin-top: 30px;
@@ -136,13 +92,13 @@ button:hover {
     border-radius: 12px;
     opacity: 0;
     transition: opacity 0.5s;
-    pointer-events: none; 
+    pointer-events: none;
     z-index: 1;
 }
 
 .expense-section li:hover::after {
     opacity: 1;
-} 
+}
 
 .button-container {
     margin-top: 20px;
@@ -211,8 +167,7 @@ button:hover {
     margin-right: auto;
 }
 
-.leaderboard-list {
-    list-style-type: none;
+.leaderboard-list {    list-style-type: none;
     padding: 0;
 }
 
@@ -225,20 +180,6 @@ button:hover {
     justify-content: space-between;
     align-items: center;
     border-left: 4px solid #007bff;
-}
-
-.delete-btn {
-    position: relative;
-    z-index: 3; 
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.delete-btn:hover {
-    background-color: #c82333;
 }
 
 .rank {
@@ -259,27 +200,19 @@ button:hover {
 }
 
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    
-    .container {
-        padding: 15px;
-    }
-    
     .button-container {
         flex-direction: column;
     }
-    
+
     .leaderboard-list li {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .expense-section {
         padding: 30px;
     }
-    
+
     .expense-section li {
         padding: 20px;
     }
