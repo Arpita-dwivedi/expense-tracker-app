@@ -42,6 +42,14 @@
                 <option value="weekly">This Week</option>
                 <option value="monthly">This Month</option>
             </select>
+            <label for="itemsPerPage">Items per page:</label>
+            <select id="itemsPerPage">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+            </select>
             <button id="downloadBtn" disabled>Download CSV</button>
         </div>
         <table id="transactionTable" style="width: 100%; border-collapse: collapse; margin-top: 20px; border: 1px solid #ddd;">

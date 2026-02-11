@@ -35,9 +35,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
     const pageInfo = document.getElementById("pageInfo");
+    const itemsPerPageSelect = document.getElementById("itemsPerPage");
 
     let currentPage = 1;
     let totalPages = 1;
+    let itemsPerPage = parseInt(localStorage.getItem("itemsPerPage")) || 10;
 
     const staticCategories = ["Food", "Groceries", "Transport", "Petrol", "Utilities", "Entertainment", "Health", "Rent", "Salary", "Miscellaneous"];
 
@@ -102,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadExpenses(period = 'all', page = 1) {
         try {
             const res = await axios.get(
-                `http://localhost:3000/api/expenses?period=${period}&page=${page}&limit=10`,
+                `http://localhost:3000/api/expenses?period=${period}&page=${page}&limit=${itemsPerPage}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
@@ -129,6 +131,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             totalPages = res.data.totalPages;
             currentPage = res.data.currentPage;
+            
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+                loadExpenses(period, currentPage);
+                return;
+            }
+
             pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
 
             prevBtn.disabled = currentPage <= 1;
@@ -167,10 +176,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     }
+    itemsPerPageSelect.value = itemsPerPage;
 
     loadExpenses();
 
     periodSelect.addEventListener("change", () => {
+        currentPage = 1;
+        loadExpenses(periodSelect.value, currentPage);
+    });
+
+    itemsPerPageSelect.addEventListener("change", () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value);
+        localStorage.setItem("itemsPerPage", itemsPerPage);
         currentPage = 1;
         loadExpenses(periodSelect.value, currentPage);
     });
