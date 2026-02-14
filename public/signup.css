@@ -73,3 +73,18 @@ body {
     text-decoration: none;
     font-weight: 600;
 }
+
+.home-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: opacity 0.3s ease;
+}
+
+.home-link:hover {
+    opacity: 0.8;
+}
