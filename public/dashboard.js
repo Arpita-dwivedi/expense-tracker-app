@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", async () => {
-
     const token = localStorage.getItem("token");
     if (!token) {
         window.location.replace("/login.html");
@@ -49,33 +48,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (descriptionInput) {
+        let debounceTimer;
         descriptionInput.addEventListener('input', async () => {
             const text = descriptionInput.value.trim();
+            clearTimeout(debounceTimer);
             if (!text) {
                 categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
                 return;
             }
-            try {
-                const res = await axios.post('/api/ai/suggest-category', { description: text });
-                const cat = res.data?.category;
-                if (cat) {
-                    categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('') + `<option value="${cat}"></option>`;
-                    if (categoryInput && !categoryInput.value) {
-                        categoryInput.value = cat;
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await axios.post('http://localhost:3000/api/ai/suggest-category', { description: text });
+                    const cat = res.data?.category;
+                    if (cat && cat !== 'Miscellaneous') {
+                        categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('') + `<option value="${cat}"></option>`;
+                        if (categoryInput) {
+                            categoryInput.value = cat;
+                        }
+                    } else if (cat === 'Miscellaneous') {
+                        categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
                     }
-                } else {
-                    categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
+                } catch (err) {
+                    // Silent fail
                 }
-            } catch (err) {
-                console.error('Suggestion error:', err);
-                categorySuggestions.innerHTML = staticCategories.map(c => `<option value="${c}"></option>`).join('');
-            }
+            }, 300);
         });
     }
 
     expenseForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         const amount = document.getElementById("amount").value;
         const description = document.getElementById("description").value;
         const category = document.getElementById("category").value;
@@ -86,10 +87,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 { amount, description, category },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             expenseForm.reset();
             loadExpenses();
-
         } catch (err) {
             console.error(err);
             if (err.response && err.response.status === 401) {
@@ -101,49 +100,40 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     });
+
     async function loadExpenses(period = 'all', page = 1) {
         try {
             const res = await axios.get(
                 `http://localhost:3000/api/expenses?period=${period}&page=${page}&limit=${itemsPerPage}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             transactionBody.innerHTML = "";
-
             res.data.expenses.forEach(exp => {
                 const tr = document.createElement("tr");
-
                 const date = new Date(exp.createdAt).toLocaleDateString();
                 const debit = exp.category === 'Salary' ? '' : exp.amount;
                 const credit = exp.category === 'Salary' ? exp.amount : '';
-
                 tr.innerHTML = `
-                    <td style="border: 1px solid #ddd; padding: 8px;">${date}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${debit}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${credit}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${exp.description}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${exp.category}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;">${exp.note || ''}</td>
-                    <td style="border: 1px solid #ddd; padding: 8px;"><button class="delete-btn" data-id="${exp.id}">Delete</button></td>
+                    <td style="border:1px solid #ddd;padding:8px;">${date}</td>
+                    <td style="border:1px solid #ddd;padding:8px;">${debit}</td>
+                    <td style="border:1px solid #ddd;padding:8px;">${credit}</td>
+                    <td style="border:1px solid #ddd;padding:8px;">${exp.description}</td>
+                    <td style="border:1px solid #ddd;padding:8px;">${exp.category}</td>
+                    <td style="border:1px solid #ddd;padding:8px;">${exp.note || ''}</td>
+                    <td style="border:1px solid #ddd;padding:8px;"><button class="delete-btn" data-id="${exp.id}">Delete</button></td>
                 `;
-
                 transactionBody.appendChild(tr);
             });
-
             totalPages = res.data.totalPages;
             currentPage = res.data.currentPage;
-            
             if (currentPage > totalPages && totalPages > 0) {
                 currentPage = totalPages;
                 loadExpenses(period, currentPage);
                 return;
             }
-
             pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-
             prevBtn.disabled = currentPage <= 1;
             nextBtn.disabled = currentPage >= totalPages;
-
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = e.target.getAttribute('data-id');
@@ -165,7 +155,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     }
                 });
             });
-
         } catch (err) {
             console.error(err);
             if (err.response && err.response.status === 401) {
@@ -177,8 +166,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     }
-    itemsPerPageSelect.value = itemsPerPage;
 
+    itemsPerPageSelect.value = itemsPerPage;
     loadExpenses();
 
     periodSelect.addEventListener("change", () => {
@@ -222,19 +211,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     window.location.replace("/login.html");
                     return;
                 }
-
                 const res = await axios.post(
                     "http://localhost:3000/api/order/premium",
                     {},
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-
                 sessionStorage.setItem("lastOrderId", res.data.orderId);
-
-                const cashfree = Cashfree({
-                    mode: "sandbox"
-                });
-
+                const cashfree = Cashfree({ mode: "sandbox" });
                 cashfree.checkout({
                     paymentSessionId: res.data.paymentSessionId,
                     redirectTarget: "_self"
@@ -251,20 +234,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     }
+
     async function checkPremiumStatus() {
         try {
             const token = localStorage.getItem("token");
-
             if (!token) {
                 console.error("No token found!");
                 return;
             }
-
             const res = await axios.get(
                 "http://localhost:3000/api/users/me",
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-
             if (res.data.isPremium) {
                 const msgBox = document.getElementById("premiumMessage");
                 if (msgBox) msgBox.style.display = "block";
@@ -286,7 +267,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     `http://localhost:3000/api/expenses?period=${periodSelect.value}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-
                 const csvContent = "data:text/csv;charset=utf-8,"
                     + "Date,Debit,Credit,Description,Category\n"
                     + res.data.map(exp => {
@@ -295,7 +275,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         const credit = exp.category === 'Salary' ? exp.amount : '';
                         return `${date},${debit},${credit},"${exp.description}",${exp.category}`;
                     }).join("\n");
-
                 const encodedUri = encodeURI(csvContent);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedUri);

@@ -1,4 +1,6 @@
 .env
 node_modules
 package-Lock.json
-config
+config/
+backend/logs/
+backend/logs/access-*.log
