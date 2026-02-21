@@ -1,5 +1,4 @@
 const { GoogleGenAI } = require('@google/genai');
-
 const safeMapSuggest = (description) => {
     if (!description) return '';
     const s = description.toLowerCase();

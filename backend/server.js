@@ -25,6 +25,6 @@ app.use("/api/order", orderRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/ai", aiRoutes);
 
-sequelize.sync({ alter: true, logging: false }).then(() => {
-    app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+sequelize.sync().then(() => {
+    app.listen(process.env.PORT, () => console.log(`server is running on http://localhost:${process.env.PORT}`));
 });

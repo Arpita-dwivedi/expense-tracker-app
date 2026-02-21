@@ -14,9 +14,7 @@ function setupTransporter() {
                 pass: process.env.EMAIL_PASS
             }
         });
-        console.log('Using Gmail transporter');
     } else {
-        console.log('No Gmail credentials found');
         transporter = null; 
     }
 }

@@ -32,7 +32,7 @@ exports.login = async (req, res) => {
     }
     const token = jwt.sign(
         { userId: result.user.id, email: result.user.email },
-        "SECRET_KEY",
+        process.env.JWT_SECRET,
         { expiresIn: "1h" }
     );
     res.status(200).json({ success: true, message: "Login successful", token: token });
